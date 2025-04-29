@@ -142,9 +142,14 @@ def get_lat_long(filepath):
 wind_farms_europe = {
 
 ### USA
-    'VineyardWind1':                            'vineyardwind.geojson',             
-    # 'Revolutionwind_southforkwind':             'revolutionwind_southforkwind.geojson', 
 
+    'VineyardWind1_boundary':                   'vineyardwind.geojson' ,            
+ 
+    # 'Revolutionwind_shouthforkwind_boundarys':  'south_fork_wind.geojson',
+
+    # 'Costal_virginia_boundarys':                'costalvirginiawindposistions.geojson',
+
+    # 'Eneco_luutherduinen_boundarys':            'eneco_lutherduinen_turbine_coordinates.geojson'                      
     
 }
 

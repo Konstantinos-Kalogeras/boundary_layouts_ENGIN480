@@ -17,41 +17,42 @@ from py_wake.site.shear import PowerShear
 import pickle
 
 
-with open('utm_boundary.pkl', 'rb') as f:
+with open(r'boundary_layouts_ENGIN480\boundary_and_layouts\utm_boundary.pkl', 'rb') as f:
     boundary = np.array(pickle.load(f))
 
-with open('utm_layout.pkl', 'rb') as f:
+with open(r'boundary_layouts_ENGIN480\boundary_and_layouts\utm_layout.pkl', 'rb') as f:
     xinit,yinit = np.array(pickle.load(f))
 
 
-maxiter = 1000
+maxiter = 200
 tol = 1e-6
 
-class SG_110_200_DD(GenericWindTurbine):
+class Haliade_X(GenericWindTurbine):
     def __init__(self):
         """
-        Parameters
-        ----------
-        The turbulence intensity Varies around 6-8%
-        Hub Height Site Specific
+        paramiters
+        __________
+        The turbulance intesity varies around 6-8%
         """
-        GenericWindTurbine.__init__(self, name='SG 11.0-200 DD', diameter=200, hub_height=140,
-                             power_norm=11000, turbulence_intensity=0.08)
+        GenericWindTurbine.__init__(self, name='Haliade-X', diameter=220, hub_height=150, 
+                                    power_norm=13000, turbulence_intensity=0.07)
 
-
-class Revolutionwind_southforkwind(UniformWeibullSite):
-    def __init__(self, ti=0.07, shear=None):
-        f = [7.2913, 7.2204, 6.3564, 5.5052, 4.743, 4.7018, 7.7244, 11.6506, 13.331, 11.079, 10.9413, 9.4554] 
-        a = [10.37, 10.58, 9.66, 9.33, 9.68, 10.57, 11.77, 13.87, 12.79, 12.12, 12.36, 10.3] 
-        k = [2.053, 1.729, 1.635, 1.689, 1.412, 1.42, 1.529, 1.943, 2.076, 2.197, 2.295, 2.201] 
+class VinyardWind2(UniformWeibullSite):
+    def __init__(self, ti=0.07, shear=PowerShear(h_ref=150, alpha=0.1)):
+        f =[6.4452, 7.6731, 6.4753, 6.0399, 4.8786, 
+             4.5063, 7.318, 11.7828, 13.0872, 11.1976, # this lisrt was multiplied by 0.01 using chatGpt
+            11.1351, 9.461]
+        a = [10.26,    10.44,     9.52,     8.96,     9.58,
+             9.72,    11.48 ,   13.25,    12.46,    11.40,    12.35,    10.48]
+        k = [ 2.225,    1.697,    1.721,    1.689 ,   1.525  ,  1.498 ,
+                1.686,    2.143 ,   2.369   , 2.186    ,2.385   , 2.404]
         UniformWeibullSite.__init__(self, np.array(f) / np.sum(f), a, k, ti=ti, shear=shear)
-        self.initial_position = np.array([xinit, yinit]).T
-        self.name = "Revolutionwind Southforkwind"
+        # self.initial_position = np.array([site.x, site.y]).T
+        self.name = 'Vinyard Wind Farm'
 
+wind_turbines = Haliade_X()
 
-wind_turbines = SG_110_200_DD()
-
-site = Revolutionwind_southforkwind()
+site = VinyardWind2()
 
 sim_res = Bastankhah_PorteAgel_2014(site, wind_turbines, k=0.0324555)
 
@@ -85,7 +86,7 @@ problem = TopFarmProblem(design_vars= {'x': xinit, 'y': yinit},
 
 cost, state, recorder = problem.optimize()
 
-recorder.save('optimization_revwind')
+recorder.save('optimization_VinyardWind1')
 
 print('done')
 
