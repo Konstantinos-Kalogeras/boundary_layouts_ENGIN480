@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from topfarm.cost_models.cost_model_wrappers import CostModelComponent
@@ -24,41 +23,47 @@ with open(r'boundary_layouts_ENGIN480\boundary_and_layouts\utm_layout.pkl', 'rb'
     xinit,yinit = np.array(pickle.load(f))
 
 
-maxiter = 200
+maxiter = 1000
 tol = 1e-6
 
-class Haliade_X(GenericWindTurbine):
+class V_1123(GenericWindTurbine):
     def __init__(self):
         """
         paramiters
         __________
         The turbulance intesity varies around 6-8%
         """
-        GenericWindTurbine.__init__(self, name='Haliade-X', diameter=220, hub_height=150, 
-                                    power_norm=13000, turbulence_intensity=0.07)
+        # GenericWindTurbine.__init__(self, name = 'V_1123', diameter = 112,hub_height = 100,
+                                    #    Power_norm = 3000, turbulance_intesity = 0.07)
+        GenericWindTurbine.__init__(self, name='V_11-23', diameter=112, hub_height=100, 
+                                    power_norm=3000, turbulence_intensity=0.07)
 
-class VinyardWind2(UniformWeibullSite):
-    def __init__(self, ti=0.07, shear=PowerShear(h_ref=150, alpha=0.1)):
-        f =[6.4452, 7.6731, 6.4753, 6.0399, 4.8786, 
-             4.5063, 7.318, 11.7828, 13.0872, 11.1976, # this lisrt was multiplied by 0.01 using chatGpt
-            11.1351, 9.461]
-        a = [10.26,    10.44,     9.52,     8.96,     9.58,
-             9.72,    11.48 ,   13.25,    12.46,    11.40,    12.35,    10.48]
-        k = [ 2.225,    1.697,    1.721,    1.689 ,   1.525  ,  1.498 ,
-                1.686,    2.143 ,   2.369   , 2.186    ,2.385   , 2.404]
+
+class EnedoLuchterdunenData(UniformWeibullSite):
+    def __init__(self, ti= 0.07, shear=PowerShear(h_ref=100, alpha = 0.1)):
+        f = [ 5.8007, 6.1557, 6.2208, 6.4858, 5.471, 5.4741, 
+             7.7938, 13.2815, 16.8045, 10.4752, 8.6837, 7.3532]
+        a = [7.95 ,    9.00 ,   9.45  ,  10.41 ,    8.87 ,    9.33   ,
+              11.30 ,   12.62  ,  12.07   , 11.04   ,  9.49  ,   9.34]
+        k = [2.002  ,  2.436 ,   2.662   , 2.533,    2.244,    2.291  ,
+               2.205 ,   2.432 ,  2.260    ,2.127 ,   2.174,    2.068]
         UniformWeibullSite.__init__(self, np.array(f) / np.sum(f), a, k, ti=ti, shear=shear)
         # self.initial_position = np.array([site.x, site.y]).T
-        self.name = 'Vinyard Wind Farm'
+        self.name = 'Reovolution South Fork Wind'
 
-wind_turbines = Haliade_X()
+wind_turbines = V_1123()
 
-site = VinyardWind2()
+site = EnedoLuchterdunenData()
 
 sim_res = Bastankhah_PorteAgel_2014(site, wind_turbines, k=0.0324555)
 
 def aep_func(x,y):
     aep = sim_res(x,y).aep().sum()
     return aep
+def daep_func(x,y):
+    daep = sim_res.aep_gradients(gradient_method=autograd, wrt_arg=['x','y'], x=x,
+                                y=y)
+    return daep
 
 
 boundary_closed = np.vstack([boundary, boundary[0]])
@@ -86,8 +91,9 @@ problem = TopFarmProblem(design_vars= {'x': xinit, 'y': yinit},
 
 cost, state, recorder = problem.optimize()
 
-recorder.save('optimization_VinyardWind1')
+recorder.save('optimization_EnecoLutherduinenSite')
 
 print('done')
 
 print('done')
+

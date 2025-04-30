@@ -143,13 +143,13 @@ wind_farms_europe = {
 
 ### USA
 
-    'VineyardWind1_boundary':                   'vineyardwind.geojson' ,            
+    # 'VineyardWind1_boundary':                   'vineyardwind.geojson' ,            
  
     # 'Revolutionwind_shouthforkwind_boundarys':  'south_fork_wind.geojson',
 
     # 'Costal_virginia_boundarys':                'costalvirginiawindposistions.geojson',
 
-    # 'Eneco_luutherduinen_boundarys':            'eneco_lutherduinen_turbine_coordinates.geojson'                      
+    'Eneco_luutherduinen_boundarys':            'eneco_lutherduinen_turbine_coordinates.geojson'                      
     
 }
 
